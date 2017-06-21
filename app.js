@@ -46,7 +46,7 @@ while(_assigned<noOfGroups-1){
 	}
 }
 
-console.log('group1_matches_list...');
+console.log('_finalGroups...');
 console.log(_finalGroups);
 
 function getGroupMatchList(_group_id, group_matches){

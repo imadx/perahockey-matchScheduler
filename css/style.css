@@ -1,0 +1,28 @@
+
+		.hidden{
+			height: 0;
+			overflow: hidden;
+			transition: all .3s;
+		}
+		i{
+			transition: all .3s;
+		}
+		.nav-header-link{
+			cursor: pointer;
+		}
+		.heading-controls{
+			padding: 10pt;
+			background: #F2F2F2;
+			border-radius: 5pt;
+			margin-bottom: 30pt;
+		}
+		.footer{
+			background: #333;
+			color: #fff;
+			padding: 10pt;
+			text-align: center;
+		}
+		.fa-inline{
+			line-height: 1 !important;
+			font-size: 1em !important;
+		}
