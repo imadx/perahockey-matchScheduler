@@ -12,7 +12,11 @@
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/style.css">
 	<script src="js/lodash.min.js"></script>
-	
+	<meta property="og:url"                content="https://perahockey.herokuapp.com/" />
+	<meta property="og:type"               content="website" />
+	<meta property="og:title"              content="Pera 6's - Match Scheduler - by Ishan Madhusanka" />
+	<meta property="og:description"        content="A web application to prevent conflicts in match schedules, for group tournaments" />
+	<meta property="og:image"              content="https://perahockey.herokuapp.com/img/promo.png" />
 	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 </head>
