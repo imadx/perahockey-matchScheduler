@@ -13,6 +13,7 @@ var app = new Vue({
 		things_changed: false,
 
 		generatingSchedule: false,
+		may_contain_invalid_cases: false,
 	},
 	methods: {
 		addNewTeam: function(){
@@ -191,6 +192,35 @@ var app = new Vue({
 					break
 				};
 			}
+		},
+		downloadSchedule: function(){
+			let pom = document.createElement('a');
+			let csvContent= this.getTeams();
+			let blob = new Blob([csvContent],{type: 'text/csv;charset=utf-8;'});
+			let url = URL.createObjectURL(blob);
+
+			let _d = new Date();
+			pom.href = url;
+
+			pom.setAttribute('download', 'Teams ' + _d.toLocaleString() + '.csv');
+			pom.click();
+		},
+		getTeams: function(){
+			let vm = this;
+			let output = '';
+			let teams = vm.teams;
+
+			_.forEach(vm.scheduled_groups, function(_groups, _group_id){
+				output += 'Group ' + (+_group_id + 1) + '\n';
+
+				_.forEach(_groups, function(_match){
+					output += teams[_match[0]] + ',vs.,' + teams[_match[1]] + '\n';
+				})
+
+				output += '\n'
+			})
+
+			return output;
 		}
 	},
 	watch:{

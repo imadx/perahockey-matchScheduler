@@ -112,7 +112,11 @@
 			<template v-else v-show="!generatingSchedule">
 				<span class="badge badge-danger float-right" v-if="_.keys(scheduled_groups).length != new_numberOfGroups">Some groups are missing, try again! <button class="btn btn-warning my-2 my-sm-0" @click="generateSchedule">Generate Schedule &nbsp;<i class="fa fa-refresh fa-inline"></i></button></span>
 				<span class="badge badge-danger float-right" v-if="may_contain_invalid_cases">Some matches are conflicting, try again! <button class="btn btn-warning my-2 my-sm-0" @click="generateSchedule">Generate Schedule &nbsp;<i class="fa fa-refresh fa-inline"></i></button></span>
-				<button class="btn btn-primary my-2 my-sm-0 float-right" @click="generateSchedule" v-else>Generate Schedule &nbsp;<i class="fa fa-refresh fa-inline"></i></button>
+				<template v-else>
+					<button class="btn btn-primary my-2 my-sm-0 float-right ml-1" @click="downloadSchedule">Download Schedule &nbsp;<i class="fa fa-download fa-inline"></i></button>
+					<button class="btn btn-primary my-2 my-sm-0 float-right" @click="generateSchedule">Generate Schedule &nbsp;<i class="fa fa-refresh fa-inline"></i></button>
+					
+				</template>
 				
 			</template>
 		</h5>
