@@ -226,10 +226,10 @@ var app = new Vue({
 			output += 'Groups\n'
 			_.forEach(vm.scheduled_groups, function(_groups, _group_id){
 				output += 'Group ' + (+_group_id + 1) + '\n';
-				output += 'id,Team 1, , Team 2\n';
+				output += 'court,Team 1, , Team 2\n';
 
 				_.forEach(_groups, function(_match, idx){
-					output += idx + ',' + teams[_match[0]] + ',vs.,' + teams[_match[1]] + '\n';
+					output +=  'Court ' + (_match.court+1) + ',' + teams[_match[0]] + ',vs.,' + teams[_match[1]] + '\n';
 				})
 
 				output += '\n'
@@ -267,15 +267,20 @@ var app = new Vue({
 			let _num_matches = 0;
 			let _num_groups = vm.new_numberOfGroups;
 
-			_.forEach(_scheduled_groups, function(_group){
+			_.forEach(_scheduled_groups, function(_group,_idx){
 				_num_matches += _.size(_group);
+				_indices[_idx] = 0;
 			})
 
 			let _curr_group = 0;
 			let _curr_court = 0;
 
+
 			for (var i = 0; i < _num_matches; i++) {
+
 				_finalCourts[_curr_court].push(_.flatten(_scheduled_groups[_curr_group].splice(0,1)))
+				vm.scheduled_groups[_curr_group][_indices[_curr_group]].court = _curr_court;
+				_indices[_curr_group]++;
 
 				_curr_group++;
 				_curr_court++;

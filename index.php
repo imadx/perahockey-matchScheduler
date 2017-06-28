@@ -145,11 +145,13 @@
 						<div class="card-block">
 							<table class="table table-striped text-center table-schedules">
 								<tr>
+									<th class="text-center">Court #</th>
 									<th class="text-center">Team 1</th>
 									<th></th>
 									<th class="text-center">Team 2</th>
 								</tr>
 								<tr v-for="match in group" :class="{'active': (match[0]==selectedGroup || match[1]==selectedGroup)}">
+									<td>Court {{match.court + 1}}</td>
 									<td class="setActive" :class="{'active': (match[0]==selectedGroup)}" @click="setSelectedGroup(match[0])">{{teams[match[0]]}}</td>
 									<td>vs.</td>
 									<td class="setActive" :class="{'active': (match[1]==selectedGroup)}" @click="setSelectedGroup(match[1])">{{teams[match[1]]}}</td>
