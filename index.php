@@ -8,6 +8,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Match Scheduler - Pera 6s - by Ishan Madhusanka</title>
 	<script src="js/vue.js"></script>
+	<script src="js/moment.min.js"></script>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/font-awesome.min.css">
 	<link rel="stylesheet" href="css/style.css">
@@ -59,6 +60,11 @@
 						<input class="mt-2 form-control" type="number" placeholder="0" v-model="new_numberOfGroups">
 					</label>
 			</span>
+			<span class="col">
+					<label class="form-control" >Number of Courts
+						<input class="mt-2 form-control" type="number" placeholder="0" v-model="new_numberOfCourts">
+					</label>
+			</span>
 
 <!-- 			<div class="col">
 				<label for="" class="form-control">Add New Team
@@ -77,25 +83,29 @@
 
 			<div class="row mt-2">
 				<div class="col">
-					<table class="table">
+					<table class="table table-minified">
 						<tr>
 							<th>ID</th>
+							<th>Group</th>
 							<th>Team Name</th>
 						</tr>
-						<tr v-for="(team, id) in teams" v-if="id%2==0">
-							<td>{{id}}</td>
+						<tr v-for="(team, id) in teams" v-if="id < new_numberOfTeams/2">
+							<td class="text-center">{{id}}</td>
+							<td class="text-center">{{Math.ceil((id+1)/(new_numberOfTeams/new_numberOfGroups))}}</td>
 							<td><input type="text" class="form-control" v-model="teams[id]"></td>
 						</tr>
 					</table>
 				</div>
 				<div class="col">
-					<table class="table">
+					<table class="table table-minified">
 						<tr>
 							<th>ID</th>
+							<th>Group</th>
 							<th>Team Name</th>
 						</tr>
-						<tr v-for="(team, id) in teams" v-if="id%2==1">
-							<td>{{id}}</td>
+						<tr v-for="(team, id) in teams" v-if="id >= new_numberOfTeams/2">
+							<td class="text-center">{{id}}</td>
+							<td class="text-center">{{Math.ceil((id+1)/(new_numberOfTeams/new_numberOfGroups))}}</td>
 							<td><input type="text" class="form-control" v-model="teams[id]"></td>
 						</tr>
 					</table>
@@ -106,6 +116,7 @@
 		<hr>
 		<h5 class="mb-1">
 			<i class="fa fa-clock-o fa-inline"></i> Schedules
+			<span class="text-muted small">Click on a team to highlight matches</span>
 			<template v-if="things_changed && !generatingSchedule">
 				<span class="badge badge-info float-right">Teams changed, schedule again! <button class="btn btn-primary my-2 my-sm-0" @click="generateSchedule">Generate Schedule &nbsp;<i class="fa fa-refresh fa-inline"></i></button></span>
 			</template>
@@ -132,16 +143,16 @@
 							</h5>
 						</div>
 						<div class="card-block">
-							<table class="table table-striped text-center">
+							<table class="table table-striped text-center table-schedules">
 								<tr>
 									<th class="text-center">Team 1</th>
 									<th></th>
-									<th class="text-center">Team 1</th>
+									<th class="text-center">Team 2</th>
 								</tr>
-								<tr v-for="match in group" >
-									<td>{{teams[match[0]]}}</td>
+								<tr v-for="match in group" :class="{'active': (match[0]==selectedGroup || match[1]==selectedGroup)}">
+									<td class="setActive" :class="{'active': (match[0]==selectedGroup)}" @click="setSelectedGroup(match[0])">{{teams[match[0]]}}</td>
 									<td>vs.</td>
-									<td>{{teams[match[1]]}}</td>
+									<td class="setActive" :class="{'active': (match[1]==selectedGroup)}" @click="setSelectedGroup(match[1])">{{teams[match[1]]}}</td>
 								</tr>
 							</table>
 						</div>
@@ -150,6 +161,47 @@
 			</div>
 		</div>
 
+		<hr>
+		<h5 class="mb-1">
+			<i class="fa fa-clock-o fa-inline"></i> Court Allocation
+			<span class="text-muted small">Click on a team to highlight matches</span>
+		</h5>
+		<div class="form-inline columns heading-controls time-controls py-3 mt-2">
+			<label class="col"><span>Start Time <br></span><input class="form-control" type="time" v-model="time_startTime"/></label>
+			<label class="col minutes"><span>Match Duration</span><input class="form-control" type="number" v-model="time_matchDuration"/><i>minutes</i></label>
+			<label class="col minutes"><span>Match Interval</span><input class="form-control" type="number" v-model="time_matchInterval"/><i>minutes</i></label>
+			<label class="col"><span>Lunch time</span><input class="form-control" type="time" v-model="time_lunchStart"/></label>
+			<label class="col minutes"><span>Lunch duration</span><input class="form-control" type="number" v-model="time_lunchDuration"/> <i>minutes</i></label>
+		</div>
+		<div class="clearfix"></div>
+		
+		<div class="mb-5">
+			<div class="row mt-2">
+				<div :class="{'col-md-4': (new_numberOfCourts%3==0), 'col-md-6': (new_numberOfCourts%2==0)}" v-for="(court, _court_id, _index) in scheduled_courts">
+					<div class="m-2 card">
+						<div class="card-header">
+							<h5 class="mt-2">Court {{+_court_id+1}}</h5>
+						</div>
+						<div class="card-block">
+							<table class="table table-striped text-center table-schedules">
+								<tr>
+									<th class="text-center">Time</th>
+									<th class="text-center">Team 1</th>
+									<th></th>
+									<th class="text-center">Team 1</th>
+								</tr>
+								<tr v-for="(match,index) in court" :class="{'active': (match[0]==selectedGroup || match[1]==selectedGroup)}">
+									<td>{{moment(index)}}</td>
+									<td class="setActive" :class="{'active': (match[0]==selectedGroup)}" @click="setSelectedGroup(match[0])">{{teams[match[0]]}}</td>
+									<td>vs.</td>
+									<td class="setActive" :class="{'active': (match[1]==selectedGroup)}" @click="setSelectedGroup(match[1])">{{teams[match[1]]}}</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 	</div>
 </div>

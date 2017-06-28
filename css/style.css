@@ -1,28 +1,76 @@
+.hidden{
+	height: 0;
+	overflow: hidden;
+	transition: all .3s;
+}
+i{
+	transition: all .3s;
+}
+.nav-header-link{
+	cursor: pointer;
+}
+.heading-controls{
+	padding: 10pt;
+	background: #F2F2F2;
+	border-radius: 5pt;
+	margin-bottom: 30pt;
+}
+.footer{
+	background: #333;
+	color: #fff;
+	padding: 10pt;
+	text-align: center;
+}
+.fa-inline{
+	line-height: 1 !important;
+	font-size: 1em !important;
+}
+table input{
+    padding: 0.3em 0.5em !important;
+}
+.table tr{
+}
+.table td{
+	padding: 0.4em 0.5em !important;
+}
+.table-minified td{
+	padding: 0.3em 0.5em !important;	
+}
+tr.active{
+	background: #3d84ff !important;
+	color: #fff !important;
+}
+td.active{
+	background: #1863E5 !important;
+	color: #fff !important;	
+}
+.table-schedules td.setActive{
+	cursor: pointer;
+}
+.table-schedules td.setActive:hover{
+	background: #209EFF;
+	color: #fff;
+	border-radius: 2px;
+}
+.card-block{
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
 
-		.hidden{
-			height: 0;
-			overflow: hidden;
-			transition: all .3s;
-		}
-		i{
-			transition: all .3s;
-		}
-		.nav-header-link{
-			cursor: pointer;
-		}
-		.heading-controls{
-			padding: 10pt;
-			background: #F2F2F2;
-			border-radius: 5pt;
-			margin-bottom: 30pt;
-		}
-		.footer{
-			background: #333;
-			color: #fff;
-			padding: 10pt;
-			text-align: center;
-		}
-		.fa-inline{
-			line-height: 1 !important;
-			font-size: 1em !important;
-		}
+.time-controls{
+	max-width: 900px;
+}
+.time-controls label{
+	display: block;
+}
+.time-controls label.minutes input{
+	width: 60px;
+	margin-right: 10px;
+}
+.time-controls label.minutes i{
+	font-size: small;
+}
+.time-controls span{
+	display: block;
+	font-size: small;
+}

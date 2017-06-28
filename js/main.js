@@ -3,10 +3,12 @@ var app = new Vue({
 	data: {
 		teams: [],
 		new_teamName: '',
-		new_numberOfTeams: 10,
-		new_numberOfGroups: 2,
+		new_numberOfTeams: 24,
+		new_numberOfGroups: 4,
+		new_numberOfCourts: 3,
 
 		scheduled_groups: {},
+		scheduled_courts: {},
 		_assigned: 0,
 		_finalGroups: 0,
 		view_teams_all: false,
@@ -14,8 +16,19 @@ var app = new Vue({
 
 		generatingSchedule: false,
 		may_contain_invalid_cases: false,
+
+		selectedGroup: null,
+
+		time_startTime: '09:00',
+		time_lunchStart: '12:00',
+		time_matchDuration: 10,
+		time_matchInterval: 5,
+		time_lunchDuration: 30,
 	},
 	methods: {
+		setSelectedGroup: function(group){
+			this.selectedGroup = group;
+		},
 		addNewTeam: function(){
 			if(this.new_teamName){
 				this.teams.push(this.new_teamName);
@@ -99,7 +112,7 @@ var app = new Vue({
 			console.log(this._finalGroups);
 
 			this.things_changed = false;
-
+			this.getAllocatedCourtsForMatches()
 			this.generatingSchedule = false;
 		},
 		getGroupMatchList: function(_group_id, group_matches){
@@ -195,7 +208,7 @@ var app = new Vue({
 		},
 		downloadSchedule: function(){
 			let pom = document.createElement('a');
-			let csvContent= this.getTeams();
+			let csvContent= this.getData();
 			let blob = new Blob([csvContent],{type: 'text/csv;charset=utf-8;'});
 			let url = URL.createObjectURL(blob);
 
@@ -205,23 +218,98 @@ var app = new Vue({
 			pom.setAttribute('download', 'Teams ' + _d.toLocaleString() + '.csv');
 			pom.click();
 		},
-		getTeams: function(){
+		getData: function(){
 			let vm = this;
 			let output = '';
 			let teams = vm.teams;
 
+			output += 'Groups\n'
 			_.forEach(vm.scheduled_groups, function(_groups, _group_id){
 				output += 'Group ' + (+_group_id + 1) + '\n';
+				output += 'id,Team 1, , Team 2\n';
 
-				_.forEach(_groups, function(_match){
-					output += teams[_match[0]] + ',vs.,' + teams[_match[1]] + '\n';
+				_.forEach(_groups, function(_match, idx){
+					output += idx + ',' + teams[_match[0]] + ',vs.,' + teams[_match[1]] + '\n';
+				})
+
+				output += '\n'
+			})
+
+			output += 'Time Schedule\n';
+			_.forEach(vm.scheduled_courts, function(_court, _court_id){
+				output += 'Court ' + (+_court_id + 1) + '\n';
+				output += 'Time,Team 1, , Team 2\n';
+
+				_.forEach(_court, function(_match, idx){
+					output += vm.moment(idx) + ',' + teams[_match[0]] + ',vs.,' + teams[_match[1]] + '\n';
 				})
 
 				output += '\n'
 			})
 
 			return output;
+		},
+		getAllocatedCourtsForMatches: function(){
+			let vm = this;
+
+			let _finalCourts = {};
+
+			for (var i = 0; i < vm.new_numberOfCourts; i++) {
+				_finalCourts[i] = [];
+			}
+
+			let _court_id = 0;
+
+			let _scheduled_groups = _.cloneDeep(vm.scheduled_groups);
+
+			let _indices = [];
+
+			let _num_matches = 0;
+			let _num_groups = vm.new_numberOfGroups;
+
+			_.forEach(_scheduled_groups, function(_group){
+				_num_matches += _.size(_group);
+			})
+
+			let _curr_group = 0;
+			let _curr_court = 0;
+
+			for (var i = 0; i < _num_matches; i++) {
+				_finalCourts[_curr_court].push(_.flatten(_scheduled_groups[_curr_group].splice(0,1)))
+
+				_curr_group++;
+				_curr_court++;
+
+
+				if(_curr_court >= vm.new_numberOfCourts) _curr_court = 0;
+				if(_curr_group >= vm.new_numberOfGroups) _curr_group = 0;
+
+			}
+
+
+			console.log('[_num_matches]', _num_matches);
+			console.log('[_scheduled_groups]', _scheduled_groups);
+			console.log('[_finalCourts]', _finalCourts);
+
+			vm.scheduled_courts = _finalCourts;
+			
+		},
+		moment: function (index) {
+			let vm = this;
+
+			let _time = moment(vm.time_startTime, 'HH:mm');
+			_time = _time.add(index*(+vm.time_matchDuration + vm.time_matchInterval), 'm');
+
+			let _lunch = moment(vm.time_lunchStart, 'HH:mm');
+			if(_time.isSameOrAfter(_lunch)){
+				_time = _time.add(vm.time_lunchDuration, 'm');
+
+			};
+
+
+			return moment(_time, 'HH:mm').format('HH:mm') + '-' + moment(_time.add(vm.time_matchDuration,'m'), 'HH:mm').format('HH:mm');
 		}
+
 	},
 	watch:{
 		new_numberOfTeams: _.debounce(function(_count){
