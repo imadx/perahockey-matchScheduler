@@ -1,6 +1,10 @@
 body,html{
 	font-size: 10pt !important;
 }
+td,th{
+	font-size: 8pt !important;
+	font-weight: bold;
+}
 .hidden{
 	height: 0;
 	overflow: hidden;
@@ -43,6 +47,10 @@ tr.active{
 	background: #3d84ff !important;
 	color: #fff !important;
 }
+tr.idle{
+	background: #FEB8B8 !important;
+	color: #fff !important;
+}
 td.active{
 	background: #1863E5 !important;
 	color: #fff !important;	
@@ -78,7 +86,7 @@ td.active{
 	font-size: small;
 }
 .btn-xsm{
-    padding: 0.15em 1em;
+    padding: 0.15em 0.5em;
 }
 .active .btn-xsm{
 	border: solid #fff thin;

@@ -3,8 +3,8 @@ var app = new Vue({
 	data: {
 		teams: [],
 		new_teamName: '',
-		new_numberOfTeams: 24,
-		new_numberOfGroups: 4,
+		new_numberOfTeams: 36,
+		new_numberOfGroups: 6,
 		new_numberOfCourts: 3,
 
 		scheduled_groups: {},
@@ -17,7 +17,7 @@ var app = new Vue({
 		generatingSchedule: false,
 		may_contain_invalid_cases: false,
 
-		selectedGroup: null,
+		selectedGroups: [],
 
 		time_startTime: '09:00',
 		time_lunchStart: '12:00',
@@ -26,13 +26,77 @@ var app = new Vue({
 		time_lunchDuration: 30,
 	},
 	methods: {
-		setSelectedGroup: function(group){
-			this.selectedGroup = group;
+		toggleSelectedGroup: function(team){
+			let _selected_groups = this.selectedGroups;
+
+			let _selected_index = _selected_groups.indexOf(team);
+
+			console.log(_selected_index);
+			if(_selected_index<0){
+				_selected_groups.push(team);
+			} else {
+				this.selectedGroups.splice(_selected_index, 1);
+			}
+		},
+		reorderScheduledCourtsUp: function(_idx){
+
+			let vm = this;
+			let _scheduled_courts =vm.scheduled_courts;
+
+
+			if(_idx==0) return;
+
+			console.log(vm.scheduled_courts);
+			_.forEach(_scheduled_courts, function(_court){
+				console.log(_court);
+				let _x = _court[_idx];
+				_x.group = _court[_idx].group;
+				let _y = _court[_idx-1];
+				_x.group = _court[_idx-1].group;
+
+				_court[_idx] = _y;
+				_court[_idx-1] = _x;
+			})
+
+			Vue.set(vm.scheduled_courts, _scheduled_courts);
+
+		},
+		reorderScheduledCourtsDown: function(_idx){
+
+		},
+		isInSelectedGroup: function(team){
+			return (this.selectedGroups.indexOf(team)>=0);
 		},
 		addNewTeam: function(){
 			if(this.new_teamName){
 				this.teams.push(this.new_teamName);
 			}
+		},
+		getIdleTeams: function(court){
+
+			let _count = 0;
+			let teams = this.teams;
+
+			_.forEach(court, function(_match){
+				if ((teams[_match[0]] == '--') || (teams[_match[1]] == '--')){
+					_count++;
+				}
+			})
+
+			return _count;
+		},
+		checkIfIdle: function(_match){
+			let vm = this;
+			let teams = vm.teams;
+
+			if(teams[_match[0]] == '--' || teams[_match[1]] == '--' ){
+				return true;
+			} else {
+				return false;
+			}
+		},
+		getMatchesCount: function(court){
+			return _.size(court)
 		},
 		initTeams: function(count){
 
@@ -40,7 +104,8 @@ var app = new Vue({
 			for (var i = 0; i < count; i++) {
 				_teams.push('Team ' + i);
 			}
-
+			// _teams = ['PERA (MAROON)', 'RAJ B', 'COL', 'KEL A', 'MORA B', 'PERA (GOLD)', 'SAB A', 'RUH B', 'WAY A', 'KEL B', 'SJP A', 'SAB B', 'WAY B', 'UWA A', 'MORA A', 'PERA (BLUE)', 'RAJ A', 'SJP B', 'RUH A', 'UWA B', 'PERA A (GIRLS)', 'SAB A (GIRLS)', 'WAY B (GIRLS)', 'MORA B (GIRLS)', '--', 'SAB B (GIRLS)', 'KEL (GIRLS)', 'RAJ A (GIRLS)', '--', '--', 'SJP A (GIRLS)', 'WAY A (GIRLS)', 'RAJ B (GIRLS)', 'UWA (GIRLS)', '--', 'PERA B (GIRLS)', 'MORA A (GIRLS)', 'SJP B (GIRLS)', 'RUH (GIRLS)', '--']
+			_teams = ['MEN-A1', 'MEN-A2', 'MEN-A3', 'MEN-A4', 'MEN-A5', 'MEN-A6', 'MEN-B7', 'MEN-B8', 'MEN-B9', 'MEN-B10', 'MEN-B11', 'MEN-B12', 'MEN-C13', 'MEN-C14', 'MEN-C15', 'MEN-C16', 'MEN-C17', 'MEN-C18', 'MEN-D19', 'MEN-D20', 'MEN-D21', 'MEN-D22', 'MEN-D23', 'MEN-D24', 'WOMEN-A1', 'WOMEN-A2', 'WOMEN-A3', 'WOMEN-A4', '--', '--', 'WOMEN-B5', 'WOMEN-B6', 'WOMEN-B7', 'WOMEN-B8', '--', '--']
 			this.teams =  _teams;
 		},
 		recreateTeams: function(){
@@ -67,9 +132,11 @@ var app = new Vue({
 
 			for (let i = 0; i < noOfGroups; i++) {
 				groups[i] = _.filter(teams, function(team){
-					return (team%noOfGroups == i);
+					return team < ((noOfTeams/noOfGroups)*(i + 1)) && team >= ((noOfTeams/noOfGroups)*(i));
 				})
 			}
+
+			console.log('groups',groups);
 
 			let group_matches = {};
 
@@ -100,6 +167,7 @@ var app = new Vue({
 				for (var i = 0; i < noOfGroups; i++) {
 					this.getGroupMatchList(i, _.cloneDeep(group_matches[i]));
 				}
+
 
 				_test_iterations++;
 				if(_test_iterations>10){
@@ -276,13 +344,17 @@ var app = new Vue({
 			let _curr_court = 0;
 
 
+			let teams = vm.teams;
+
 			for (var i = 0; i < _num_matches; i++) {
 
 				let __match = _.flatten(_scheduled_groups[_curr_group].splice(0,1));
 				__match.group = _curr_group;
 
 
-				_finalCourts[_curr_court].push(__match);
+				if(!(teams[__match[0]]=='--' || teams[__match[1]].name=='--')){
+					_finalCourts[_curr_court].push(__match);
+				}
 				vm.scheduled_groups[_curr_group][_indices[_curr_group]].court = _curr_court;
 				_indices[_curr_group]++;
 
@@ -302,6 +374,20 @@ var app = new Vue({
 
 			vm.scheduled_courts = _finalCourts;
 			
+		},
+		fixIdleMatches: function(){
+			let vm = this;
+			let _courts = vm.scheduled_courts;
+			let teams = vm.teams;
+
+			_.forEach(_courts, function(_court, i){
+				_.remove(_court, function(_match){
+					return (teams[_match[0]]=='--') || (teams[_match[1]]=='--');
+				})
+				_courts[i] = _court;
+			})
+
+			Vue.set(vm.scheduled_courts, _courts)
 		},
 		reorderScheduledCourtsParallel: function(_idx){
 			let _matches = [];
@@ -377,6 +463,7 @@ var app = new Vue({
 		}
 	},
 	mounted: function(){
+
 		this.initTeams(this.new_numberOfTeams);
 		this.generateSchedule()
 	}
