@@ -1,3 +1,6 @@
+body,html{
+	font-size: 10pt !important;
+}
 .hidden{
 	height: 0;
 	overflow: hidden;
@@ -73,4 +76,10 @@ td.active{
 .time-controls span{
 	display: block;
 	font-size: small;
+}
+.btn-xsm{
+    padding: 0.15em 1em;
+}
+.active .btn-xsm{
+	border: solid #fff thin;
 }

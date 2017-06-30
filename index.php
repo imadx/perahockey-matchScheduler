@@ -191,12 +191,16 @@
 									<th class="text-center">Team 1</th>
 									<th></th>
 									<th class="text-center">Team 1</th>
+									<th class="text-center">Group</th>
+									<th class="text-center">Actions</th>
 								</tr>
 								<tr v-for="(match,index) in court" :class="{'active': (match[0]==selectedGroup || match[1]==selectedGroup)}">
 									<td>{{moment(index)}}</td>
 									<td class="setActive" :class="{'active': (match[0]==selectedGroup)}" @click="setSelectedGroup(match[0])">{{teams[match[0]]}}</td>
 									<td>vs.</td>
 									<td class="setActive" :class="{'active': (match[1]==selectedGroup)}" @click="setSelectedGroup(match[1])">{{teams[match[1]]}}</td>
+									<td>{{match.group + 1}}</td>
+									<td><div class="btn btn-primary btn-xsm" @click="reorderScheduledCourtsParallel(index)"><i class="fa fa-exchange fa-inline"></i></div></td>
 								</tr>
 							</table>
 						</div>

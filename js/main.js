@@ -278,7 +278,11 @@ var app = new Vue({
 
 			for (var i = 0; i < _num_matches; i++) {
 
-				_finalCourts[_curr_court].push(_.flatten(_scheduled_groups[_curr_group].splice(0,1)))
+				let __match = _.flatten(_scheduled_groups[_curr_group].splice(0,1));
+				__match.group = _curr_group;
+
+
+				_finalCourts[_curr_court].push(__match);
 				vm.scheduled_groups[_curr_group][_indices[_curr_group]].court = _curr_court;
 				_indices[_curr_group]++;
 
@@ -299,21 +303,44 @@ var app = new Vue({
 			vm.scheduled_courts = _finalCourts;
 			
 		},
+		reorderScheduledCourtsParallel: function(_idx){
+			let _matches = [];
+			let _matches_groups = [];
+			let vm = this;
+
+
+			let _shuffleOrder = [];
+			_.forEach(vm.scheduled_courts, function(_court_matches, i){
+				_shuffleOrder.push(i);
+				_matches.push(_court_matches[_idx]);
+				_matches_groups.push(_court_matches[_idx].group);
+			})
+
+			let _not_shuffledMatches = _.cloneDeep(_matches);
+			_shuffleOrder = _.shuffle(_shuffleOrder);
+
+			_.forEach(_shuffleOrder, function(i){
+				_not_shuffledMatches[_shuffleOrder[i]].group = _matches_groups[_shuffleOrder[i]];
+				Vue.set(vm.scheduled_courts[i], _idx, _not_shuffledMatches[_shuffleOrder[i]]);
+			});
+
+		},
 		moment: function (index) {
 			let vm = this;
 
 			let _time = moment(vm.time_startTime, 'HH:mm');
-			_time = _time.add(index*(+vm.time_matchDuration + vm.time_matchInterval), 'm');
+			_time = _time.add(index*((+vm.time_matchDuration) + (+vm.time_matchInterval)), 'm');
 
 			let _lunch = moment(vm.time_lunchStart, 'HH:mm');
 			if(_time.isSameOrAfter(_lunch)){
-				_time = _time.add(vm.time_lunchDuration, 'm');
+				_time = _time.add((+vm.time_lunchDuration), 'm');
 
 			};
 
 
-			return moment(_time, 'HH:mm').format('HH:mm') + '-' + moment(_time.add(vm.time_matchDuration,'m'), 'HH:mm').format('HH:mm');
-		}
+			return moment(_time, 'HH:mm').format('HH:mm') + '-' + moment(_time.add(+vm.time_matchDuration,'m'), 'HH:mm').format('HH:mm');
+		},
+
 
 	},
 	watch:{
