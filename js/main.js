@@ -238,10 +238,10 @@ var app = new Vue({
 			output += 'Time Schedule\n';
 			_.forEach(vm.scheduled_courts, function(_court, _court_id){
 				output += 'Court ' + (+_court_id + 1) + '\n';
-				output += 'Time,Team 1, , Team 2\n';
+				output += 'Time,Team 1, , Team 2,Group\n';
 
 				_.forEach(_court, function(_match, idx){
-					output += vm.moment(idx) + ',' + teams[_match[0]] + ',vs.,' + teams[_match[1]] + '\n';
+					output += vm.moment(idx) + ',' + teams[_match[0]] + ',vs.,' + teams[_match[1]] + ',' + (_match.group + 1) + '\n';
 				})
 
 				output += '\n'
