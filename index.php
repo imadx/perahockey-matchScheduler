@@ -139,7 +139,7 @@
 					<div class="m-2 card">
 						<div class="card-header">
 							<h5 class="mt-2">Group {{+_group_id+1}}
-								<button class="btn btn-primary my-2 my-sm-0 float-right" @click="getGroupMatchList(_group_id, _.cloneDeep(group));"> Re-order &nbsp; <i class="fa fa-exchange fa-inline"></i></button>
+								<button class="btn btn-primary my-2 my-sm-0 float-right" @click="getGroupMatchList(_group_id, _.cloneDeep(group), true);"> Re-order &nbsp; <i class="fa fa-exchange fa-inline"></i></button>
 							</h5>
 						</div>
 						<div class="card-block">
@@ -189,7 +189,8 @@
 			<label class="col minutes"><span>Lunch duration</span><input class="form-control" type="number" v-model="time_lunchDuration"/> <i>minutes</i></label>
 		</div>
 		<div class="clearfix"></div>
-		<div @click="fixIdleMatches" class="btn btn-primary">Fix idle matches</div>
+		<span @click="fixIdleMatches" class="btn btn-primary"><i class="fa fa-inline fa-magic"></i> Fix idle matches</span>
+		<span @click="manualCheck" class="btn btn-primary"><i class="fa fa-inline" :class="{'fa-circle-o-notch fa-spin': manualCheckIsRunning, 'fa-stethoscope': !manualCheckIsRunning}"></i> Manual Check for clashes</span>
 		<div class="mb-5">
 			<div class="row mt-2">
 				<div :class="{'col-md-4': (new_numberOfCourts%3==0), 'col-md-6': (new_numberOfCourts%2==0)}" v-for="(court, _court_id, _index) in scheduled_courts">

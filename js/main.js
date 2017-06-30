@@ -16,6 +16,7 @@ var app = new Vue({
 
 		generatingSchedule: false,
 		may_contain_invalid_cases: false,
+		manualCheckIsRunning: false,
 
 		selectedGroups: [],
 
@@ -31,7 +32,6 @@ var app = new Vue({
 
 			let _selected_index = _selected_groups.indexOf(team);
 
-			console.log(_selected_index);
 			if(_selected_index<0){
 				_selected_groups.push(team);
 			} else {
@@ -46,23 +46,81 @@ var app = new Vue({
 
 			if(_idx==0) return;
 
-			console.log(vm.scheduled_courts);
-			_.forEach(_scheduled_courts, function(_court){
-				console.log(_court);
-				let _x = _court[_idx];
-				_x.group = _court[_idx].group;
-				let _y = _court[_idx-1];
-				_x.group = _court[_idx-1].group;
+			_.forEach(_scheduled_courts, function(_court, i){
+				if(_.isUndefined(_court)){
+					return;
+				} else {
 
-				_court[_idx] = _y;
-				_court[_idx-1] = _x;
+					// console.log(_court[_idx], _court[_idx-1]);
+					let _x = _court[_idx];
+					_x.group = _court[_idx].group;
+
+					let _y = _court[_idx-1];
+					_x.group = _court[_idx-1].group;
+
+					_court[_idx] = _y;
+					_court[_idx-1] = _x;
+					// console.log(_court[_idx], _court[_idx-1]);
+
+					Vue.set(vm.scheduled_courts[i], _idx, _court[_idx])
+					Vue.set(vm.scheduled_courts[i], _idx-1, _court[_idx-1])
+				}
 			})
 
-			Vue.set(vm.scheduled_courts, _scheduled_courts);
 
 		},
 		reorderScheduledCourtsDown: function(_idx){
 
+			let vm = this;
+			let _scheduled_courts =vm.scheduled_courts;
+
+			let _last = _.size(_scheduled_courts);
+
+			if(_idx==_last-1) return;
+
+			_.forEach(_scheduled_courts, function(_court, i){
+				if(_.isUndefined(_court)){
+					return;
+				}
+				if(_.isUndefined(_court[_idx+1])){
+					return;
+				} else {
+
+					// console.log(_court[_idx], _court[_idx+1]);
+					let _x = _court[_idx];
+					_x.group = _court[_idx].group;
+
+					let _y = _court[_idx+1];
+					_x.group = _court[_idx+1].group;
+
+					_court[_idx] = _y;
+					_court[_idx+1] = _x;
+					// console.log(_court[_idx], _court[_idx+1]);
+
+					Vue.set(vm.scheduled_courts[i], _idx, _court[_idx])
+					Vue.set(vm.scheduled_courts[i], _idx+1, _court[_idx+1])
+				}
+			})
+		},
+		manualCheck: function(){
+			this.manualCheckIsRunning = !this.manualCheckIsRunning;
+
+			let vm = this;
+			let _final_id = _.size(vm.teams)-1;
+
+			_.forEach(vm.teams, function(_team, i){
+				_.delay(function(_da_team, last) {
+					console.log('_da_team',_da_team)
+					if(vm.manualCheckIsRunning){
+						vm.selectedGroups = [_da_team];
+					} else {
+						return false;
+					}
+					if(last){
+						vm.manualCheckIsRunning = false;
+					}
+				}, 300*i, i,(_final_id == i));
+			})
 		},
 		isInSelectedGroup: function(team){
 			return (this.selectedGroups.indexOf(team)>=0);
@@ -180,10 +238,13 @@ var app = new Vue({
 			console.log(this._finalGroups);
 
 			this.things_changed = false;
-			this.getAllocatedCourtsForMatches()
 			this.generatingSchedule = false;
 		},
-		getGroupMatchList: function(_group_id, group_matches){
+		getGroupMatchList: function(_group_id, group_matches, aloneCall){
+
+			if(aloneCall && aloneCall == true){
+				this._finalGroups = this.scheduled_groups;
+			}
 
 			let group_matches_list = [];
 
@@ -208,7 +269,7 @@ var app = new Vue({
 
 				// console.log('_iteration', _iteration, _match_team_1, _match_team_2)
 
-				if(_iteration < 1000) {
+				if(_iteration < 2000) {
 					if(group_matches_list[_last_match_len-1]){
 						if((group_matches_list[_last_match_len-1].indexOf(_match_team_2) != -1) || group_matches_list[_last_match_len-1].indexOf(_match_team_1) != -1){
 
@@ -233,7 +294,7 @@ var app = new Vue({
 							continue;
 						}
 					}
-				} else if(_iteration < 1500) {
+				} else if(_iteration < 2500) {
 					if(group_matches_list[_last_match_len-1]){
 						if((group_matches_list[_last_match_len-1].indexOf(_match_team_2) != -1) || group_matches_list[_last_match_len-1].indexOf(_match_team_1) != -1){
 
@@ -250,7 +311,7 @@ var app = new Vue({
 							continue;
 						}
 					}
-				} else if(_iteration < 2500) {
+				} else if(_iteration < 3000) {
 
 					if(group_matches_list[_last_match_len-1]){
 						if((group_matches_list[_last_match_len-1].indexOf(_match_team_2) != -1) || group_matches_list[_last_match_len-1].indexOf(_match_team_1) != -1){
@@ -272,6 +333,11 @@ var app = new Vue({
 					this._finalGroups[_group_id] = group_matches_list;
 					break
 				};
+
+				if(aloneCall && aloneCall == true){
+					this.scheduled_groups = this._finalGroups;
+					this.getAllocatedCourtsForMatches()
+				}
 			}
 		},
 		downloadSchedule: function(){
@@ -396,7 +462,13 @@ var app = new Vue({
 
 
 			let _shuffleOrder = [];
+
+			console.log('scheduled_courts',vm.scheduled_courts);
+
 			_.forEach(vm.scheduled_courts, function(_court_matches, i){
+				if(_.isUndefined(_court_matches)){
+					return;
+				}
 				_shuffleOrder.push(i);
 				_matches.push(_court_matches[_idx]);
 				_matches_groups.push(_court_matches[_idx].group);
@@ -460,7 +532,10 @@ var app = new Vue({
 
 			this.things_changed = true;	
 			// this.generateSchedule()
-		}
+		},
+		scheduled_groups: function(){
+			this.getAllocatedCourtsForMatches();
+		},
 	},
 	mounted: function(){
 
