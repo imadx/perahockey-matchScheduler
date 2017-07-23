@@ -163,7 +163,10 @@ var app = new Vue({
 				_teams.push('Team ' + i);
 			}
 			// _teams = ['PERA (MAROON)', 'RAJ B', 'COL', 'KEL A', 'MORA B', 'PERA (GOLD)', 'SAB A', 'RUH B', 'WAY A', 'KEL B', 'SJP A', 'SAB B', 'WAY B', 'UWA A', 'MORA A', 'PERA (BLUE)', 'RAJ A', 'SJP B', 'RUH A', 'UWA B', 'PERA A (GIRLS)', 'SAB A (GIRLS)', 'WAY B (GIRLS)', 'MORA B (GIRLS)', '--', 'SAB B (GIRLS)', 'KEL (GIRLS)', 'RAJ A (GIRLS)', '--', '--', 'SJP A (GIRLS)', 'WAY A (GIRLS)', 'RAJ B (GIRLS)', 'UWA (GIRLS)', '--', 'PERA B (GIRLS)', 'MORA A (GIRLS)', 'SJP B (GIRLS)', 'RUH (GIRLS)', '--']
-			_teams = ['MEN-A1', 'MEN-A2', 'MEN-A3', 'MEN-A4', 'MEN-A5', 'MEN-A6', 'MEN-B7', 'MEN-B8', 'MEN-B9', 'MEN-B10', 'MEN-B11', 'MEN-B12', 'MEN-C13', 'MEN-C14', 'MEN-C15', 'MEN-C16', 'MEN-C17', 'MEN-C18', 'MEN-D19', 'MEN-D20', 'MEN-D21', 'MEN-D22', 'MEN-D23', 'MEN-D24', 'WOMEN-A1', 'WOMEN-A2', 'WOMEN-A3', 'WOMEN-A4', '--', '--', 'WOMEN-B5', 'WOMEN-B6', 'WOMEN-B7', 'WOMEN-B8', '--', '--']
+			// _teams = ['MEN-A1', 'MEN-A2', 'MEN-A3', 'MEN-A4', 'MEN-A5', 'MEN-A6', 'MEN-B7', 'MEN-B8', 'MEN-B9', 'MEN-B10', 'MEN-B11', 'MEN-B12', 'MEN-C13', 'MEN-C14', 'MEN-C15', 'MEN-C16', 'MEN-C17', 'MEN-C18', 'MEN-D19', 'MEN-D20', 'MEN-D21', 'MEN-D22', 'MEN-D23', 'MEN-D24', 'WOMEN-A1', 'WOMEN-A2', 'WOMEN-A3', 'WOMEN-A4', '--', '--', 'WOMEN-B5', 'WOMEN-B6', 'WOMEN-B7', 'WOMEN-B8', '--', '--']
+			// _teams = ['Mora A', 'DRCK B', 'OLD BENZ (A)', 'VCK', 'GUNNERS', 'RUHUNA', 'OLD KINGS', 'BLUE HORSE A', 'OLDE BENZ(b)', 'MIC', 'OLD DS', 'OLD KELANI', 'KCK 16', 'BLUE HORSE (B)', 'OLD ROYAL', 'PLAZA', 'WORNIES', '--', 'MORA (B)', 'DRCK (A)', 'VIJAYA ', 'COLOMBO WONDERS', 'OLD SJP', 'MERJERY?', 'OLD PERA (GIRLS)', 'ST. JOSEPH (GIRLS)', 'OLD MORA (GIRLS)', 'BRAWLERS (GIRLS)', '--', '--', 'OLD COL (GIRLS)', 'OLD SJP (GIRLS)', 'PGCK (GIRLS)', 'BMS (GIRLS)', '--', '--' ]
+			
+
 			this.teams =  _teams;
 		},
 		recreateTeams: function(){
